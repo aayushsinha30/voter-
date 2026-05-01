@@ -24,11 +24,14 @@ export function MisinfoChecker() {
     setResult(null);
     try {
       track(events.FACT_CHECK_REQUESTED, { text_length: input.length });
-      const res = await checkMisinformation({ information: input });
-      setResult(res);
+      const result = await checkMisinformation({ information: input });
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+      setResult(result);
       track(events.FACT_CHECK_COMPLETED, {
-        is_misinformation: res.isMisinformation,
-        confidence: res.confidenceScore,
+        is_misinformation: result.isMisinformation,
+        confidence: result.confidenceScore,
       });
     } catch (e: any) {
       console.error(e);

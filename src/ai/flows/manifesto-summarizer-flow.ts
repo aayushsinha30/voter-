@@ -20,8 +20,13 @@ const ManifestoSummarizerOutputSchema = z.object({
 });
 export type ManifestoSummarizerOutput = z.infer<typeof ManifestoSummarizerOutputSchema>;
 
-export async function summarizeManifesto(input: ManifestoSummarizerInput): Promise<ManifestoSummarizerOutput> {
-  return manifestoSummarizerFlow(input);
+export async function summarizeManifesto(input: ManifestoSummarizerInput): Promise<ManifestoSummarizerOutput | { error: string }> {
+  try {
+    return await manifestoSummarizerFlow(input);
+  } catch (e: any) {
+    console.error("Manifesto summarizer error:", e);
+    return { error: e.message || "Internal Server Error" };
+  }
 }
 
 const prompt = ai.definePrompt({

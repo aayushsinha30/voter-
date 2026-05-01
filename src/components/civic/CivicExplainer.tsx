@@ -36,12 +36,15 @@ export function CivicExplainer() {
     if (topic) setConcept(topic);
     setLoading(true);
     try {
-      const res = await explainCivicConcept({ 
+      const result = await explainCivicConcept({ 
         concept: searchTerm, 
         comprehensionLevel: level,
         country: user?.country || 'India' 
       });
-      setResult(res);
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+      setResult(result);
       track(events.CIVIC_CONCEPT_SEARCHED, { concept: searchTerm, level, country: user?.country });
     } catch (e: any) {
       console.error(e);

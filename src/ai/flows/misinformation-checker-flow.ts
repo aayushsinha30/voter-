@@ -36,8 +36,13 @@ export type MisinformationCheckerOutput = z.infer<typeof MisinformationCheckerOu
 
 export async function checkMisinformation(
   input: MisinformationCheckerInput
-): Promise<MisinformationCheckerOutput> {
-  return misinformationCheckerFlow(input);
+): Promise<MisinformationCheckerOutput | { error: string }> {
+  try {
+    return await misinformationCheckerFlow(input);
+  } catch (e: any) {
+    console.error("Misinformation check error:", e);
+    return { error: e.message || "Internal Server Error" };
+  }
 }
 
 const misinformationCheckerPrompt = ai.definePrompt({

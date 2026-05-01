@@ -31,8 +31,13 @@ const PersonalVotingRoadmapOutputSchema = z.object({
 });
 export type PersonalVotingRoadmapOutput = z.infer<typeof PersonalVotingRoadmapOutputSchema>;
 
-export async function personalVotingRoadmap(input: PersonalVotingRoadmapInput): Promise<PersonalVotingRoadmapOutput> {
-  return personalVotingRoadmapFlow(input);
+export async function personalVotingRoadmap(input: PersonalVotingRoadmapInput): Promise<PersonalVotingRoadmapOutput | { error: string }> {
+  try {
+    return await personalVotingRoadmapFlow(input);
+  } catch (e: any) {
+    console.error("Roadmap generation server error:", e);
+    return { error: e.message || "Internal Server Error" };
+  }
 }
 
 const personalVotingRoadmapPrompt = ai.definePrompt({

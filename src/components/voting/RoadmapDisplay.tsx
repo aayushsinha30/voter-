@@ -34,6 +34,9 @@ export function RoadmapDisplay({ user }: { user: UserContext }) {
         age: user.age,
         voterStatus: user.voterStatus
       });
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
       setRoadmap(result);
     } catch (e: any) {
       console.error("Roadmap generation failed", e);

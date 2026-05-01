@@ -22,8 +22,11 @@ export function ManifestoTool() {
     setLoading(true);
     setSummary(null);
     try {
-      const res = await summarizeManifesto({ manifestoText: text });
-      setSummary(res.summary);
+      const result = await summarizeManifesto({ manifestoText: text });
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+      setSummary(result.summary);
       track(events.MANIFESTO_SUMMARIZED, { text_length: text.length });
     } catch (e: any) {
       console.error(e);

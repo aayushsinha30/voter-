@@ -36,8 +36,13 @@ export type CivicConceptExplainerOutput = z.infer<
 
 export async function explainCivicConcept(
   input: CivicConceptExplainerInput
-): Promise<CivicConceptExplainerOutput> {
-  return civicConceptExplainerFlow(input);
+): Promise<CivicConceptExplainerOutput | { error: string }> {
+  try {
+    return await civicConceptExplainerFlow(input);
+  } catch (e: any) {
+    console.error("Civic concept explainer error:", e);
+    return { error: e.message || "Internal Server Error" };
+  }
 }
 
 const civicConceptExplainerPrompt = ai.definePrompt({
