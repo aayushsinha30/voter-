@@ -27,12 +27,15 @@ export function ManifestoTool() {
       track(events.MANIFESTO_SUMMARIZED, { text_length: text.length });
     } catch (e: any) {
       console.error(e);
+      const msg = e.message?.includes('429') 
+        ? "API Quota Exceeded. Check your API limits." 
+        : e.message?.includes('503') 
+          ? "AI services are currently busy. Please try again in a minute."
+          : "Could not summarize the manifesto. Please try again.";
       toast({
         variant: "destructive",
         title: "Summarization Failed",
-        description: e.message?.includes('503') 
-          ? "AI services are currently busy. Please try again in a minute."
-          : "Could not summarize the manifesto. Please try again.",
+        description: msg,
       });
     } finally {
       setLoading(false);

@@ -45,12 +45,15 @@ export function CivicExplainer() {
       track(events.CIVIC_CONCEPT_SEARCHED, { concept: searchTerm, level, country: user?.country });
     } catch (e: any) {
       console.error(e);
+      const msg = e.message?.includes('429') 
+        ? "API Quota Exceeded. Check your API limits." 
+        : e.message?.includes('503')
+          ? "AI models are currently in high demand. Please try again in a moment."
+          : "Could not explain this concept. Please check your connection and try again.";
       toast({
         variant: "destructive",
         title: "Service Unavailable",
-        description: e.message?.includes('503') 
-          ? "AI models are currently in high demand. Please try again in a moment."
-          : "Could not explain this concept. Please check your connection and try again.",
+        description: msg,
       });
     } finally {
       setLoading(false);

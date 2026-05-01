@@ -37,7 +37,9 @@ export function RoadmapDisplay({ user }: { user: UserContext }) {
       setRoadmap(result);
     } catch (e: any) {
       console.error("Roadmap generation failed", e);
-      const msg = e.message?.includes('503') 
+      const msg = e.message?.includes('429')
+        ? "API Quota Exceeded. Check your Google Gemini API billing/limits."
+        : e.message?.includes('503') 
         ? "AI model is busy. Please try refreshing." 
         : "Failed to generate roadmap.";
       setError(msg);
@@ -130,7 +132,7 @@ export function RoadmapDisplay({ user }: { user: UserContext }) {
                 <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
                 {step.actionableLink && (
                   <Button variant="link" className="p-0 h-auto text-primary text-sm mt-3 gap-1.5" asChild>
-                    <a href={step.actionableLink} target="_blank" rel="noopener noreferrer">
+                    <a href={step.actionableLink.startsWith('http') ? step.actionableLink : `https://${step.actionableLink}`} target="_blank" rel="noopener noreferrer">
                       Take Action <ExternalLink className="w-3 h-3" />
                     </a>
                   </Button>

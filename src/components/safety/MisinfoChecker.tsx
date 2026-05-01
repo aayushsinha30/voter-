@@ -32,12 +32,15 @@ export function MisinfoChecker() {
       });
     } catch (e: any) {
       console.error(e);
+      const msg = e.message?.includes('429') 
+        ? "API Quota Exceeded. Check your API limits." 
+        : e.message?.includes('503')
+        ? "AI model is experiencing high load. Please try again shortly."
+        : "Unable to analyze information at this time.";
       toast({
         variant: "destructive",
-        title: "Analysis Error",
-        description: e.message?.includes('503') 
-          ? "AI model is experiencing high load. Please try again shortly."
-          : "Unable to analyze information at this time.",
+        title: "Analysis Failed",
+        description: msg,
       });
     } finally {
       setLoading(false);

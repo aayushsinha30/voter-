@@ -13,7 +13,7 @@ import {z} from 'genkit';
 const PersonalVotingRoadmapInputSchema = z.object({
   country: z.string().describe('The user\'s country of residence (e.g., India, USA).'),
   location: z.string().describe('The user\'s current residential location (city, state, zip code).'),
-  age: z.number().int().min(18).describe('The user\'s age in years.'),
+  age: z.number().int().min(16).describe('The user\'s age in years.'),
   voterStatus: z.enum(['registered', 'unregistered', 'unknown']).describe('The user\'s current voter registration status.'),
 });
 export type PersonalVotingRoadmapInput = z.infer<typeof PersonalVotingRoadmapInputSchema>;
@@ -25,7 +25,7 @@ const PersonalVotingRoadmapOutputSchema = z.object({
       stepNumber: z.number().int().min(1).describe('The sequential number of the step.'),
       title: z.string().describe('A concise title for the step.'),
       description: z.string().describe('A detailed explanation of what needs to be done for this step.'),
-      actionableLink: z.string().url().optional().describe('An optional URL for an external resource or action related to the step.'),
+      actionableLink: z.string().optional().describe('An optional URL for an external resource or action related to the step. Should include https:// if possible.'),
     })
   ).describe('An ordered list of steps the user needs to take to vote successfully.'),
 });
