@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { UserContext } from '@/app/lib/user-store';
 import { MapPin, User as UserIcon, Calendar, CheckCircle2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface OnboardingProps {
   onComplete: (data: UserContext) => void;

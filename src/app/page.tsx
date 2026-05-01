@@ -4,11 +4,11 @@ import { useUserContext } from '@/app/lib/user-store';
 import { Onboarding } from '@/components/voting/Onboarding';
 import { TopBar } from '@/components/layout/TopBar';
 import { BottomNav } from '@/components/layout/BottomNav';
-import { RoadmapDisplay } from '@/components/voting/RoadmapDisplay';
 import { Checklist } from '@/components/voting/Checklist';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Calendar, Bell, MapPin, Search } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Bell, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export default function Home() {
   const { user, saveUser, loading } = useUserContext();
@@ -94,8 +94,4 @@ export default function Home() {
       <BottomNav />
     </div>
   );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ');
 }
