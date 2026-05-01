@@ -46,7 +46,7 @@ const civicConceptExplainerPrompt = ai.definePrompt({
   output: {schema: CivicConceptExplainerOutputSchema},
   prompt: `You are an AI assistant specialized in explaining complex civic concepts in simple, easy-to-understand language.
 
-Concept: "{{{concept}}}}"
+Concept: "{{{concept}}}"
 {{#if country}}
 Country Context: {{{country}}}
 {{/if}}
