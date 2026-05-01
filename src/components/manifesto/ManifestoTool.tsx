@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Loader2, Sparkles } from 'lucide-react';
+import { FileText, Loader2, Sparkles, BookOpen } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
 export function ManifestoTool() {
@@ -18,6 +18,7 @@ export function ManifestoTool() {
   const handleSummarize = async () => {
     if (!text.trim()) return;
     setLoading(true);
+    setSummary(null);
     try {
       const res = await summarizeManifesto({ manifestoText: text });
       setSummary(res.summary);
@@ -36,43 +37,59 @@ export function ManifestoTool() {
   };
 
   return (
-    <div className="space-y-6">
-      <Card className="border-none shadow-md">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="w-6 h-6 text-primary" />
+    <div className="space-y-5">
+      <Card className="glass-card border-border/30">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent/20 to-teal-500/20 flex items-center justify-center border border-accent/20">
+              <FileText className="w-4 h-4 text-accent" />
+            </div>
             Manifesto Decoder
           </CardTitle>
-          <CardDescription>Convert long political documents into neutral, concise summaries.</CardDescription>
+          <CardDescription className="text-xs">Convert long political documents into neutral, concise summaries.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Textarea 
             placeholder="Paste candidate platform or manifesto text here..." 
-            className="min-h-[200px]"
+            className="min-h-[180px] resize-none bg-secondary/30 border-border/50 rounded-xl text-sm"
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
+          <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+            <span>{text.length} characters</span>
+            <span>Min 50 characters recommended</span>
+          </div>
           <Button 
-            className="w-full h-12 bg-accent" 
+            className="w-full h-11 bg-gradient-to-r from-accent to-teal-500 hover:opacity-90 rounded-xl btn-scale btn-glow text-sm font-semibold text-background" 
             onClick={handleSummarize} 
-            disabled={loading || !text.trim()}
+            disabled={loading || !text.trim() || text.length < 20}
           >
-            {loading ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 w-5 h-5" />}
-            Generate Neutral Summary
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin mr-2 w-4 h-4" />
+                Summarizing...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 w-4 h-4" />
+                Generate Neutral Summary
+              </>
+            )}
           </Button>
         </CardContent>
       </Card>
 
       {summary && (
-        <Card className="border-none shadow-lg animate-in slide-in-from-bottom-2">
-          <CardHeader className="bg-secondary/30">
-            <CardTitle className="text-sm font-headline uppercase tracking-widest text-primary">Key Takeaways</CardTitle>
+        <Card className="glass-card border-accent/20 overflow-hidden">
+          <CardHeader className="pb-3 border-b border-border/20">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <BookOpen className="w-4 h-4 text-accent" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-accent">Key Takeaways</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6">
-            <ScrollArea className="h-[300px] rounded-md pr-4">
-              <div className="prose prose-blue prose-sm max-w-none">
-                <p className="text-foreground leading-relaxed whitespace-pre-wrap">{summary}</p>
-              </div>
+          <CardContent className="pt-4">
+            <ScrollArea className="h-[280px] rounded-xl pr-4">
+              <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{summary}</p>
             </ScrollArea>
           </CardContent>
         </Card>

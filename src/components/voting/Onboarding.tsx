@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UserContext } from '@/app/lib/user-store';
-import { MapPin, User as UserIcon, Calendar, CheckCircle2, Globe } from 'lucide-react';
+import { MapPin, User as UserIcon, Calendar, CheckCircle2, Globe, ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface OnboardingProps {
@@ -16,11 +16,23 @@ interface OnboardingProps {
 }
 
 const COUNTRIES = [
-  { value: 'India', label: 'India' },
-  { value: 'United States', label: 'United States' },
-  { value: 'United Kingdom', label: 'United Kingdom' },
-  { value: 'Canada', label: 'Canada' },
-  { value: 'Australia', label: 'Australia' },
+  { value: 'India', label: '🇮🇳 India', flag: '🇮🇳' },
+  { value: 'United States', label: '🇺🇸 United States', flag: '🇺🇸' },
+  { value: 'United Kingdom', label: '🇬🇧 United Kingdom', flag: '🇬🇧' },
+  { value: 'Canada', label: '🇨🇦 Canada', flag: '🇨🇦' },
+  { value: 'Australia', label: '🇦🇺 Australia', flag: '🇦🇺' },
+  { value: 'Germany', label: '🇩🇪 Germany', flag: '🇩🇪' },
+  { value: 'France', label: '🇫🇷 France', flag: '🇫🇷' },
+  { value: 'Brazil', label: '🇧🇷 Brazil', flag: '🇧🇷' },
+  { value: 'Japan', label: '🇯🇵 Japan', flag: '🇯🇵' },
+  { value: 'South Korea', label: '🇰🇷 South Korea', flag: '🇰🇷' },
+];
+
+const STEP_INFO = [
+  { icon: Globe, title: 'Select your country', desc: 'Voting rules vary by nation. Tell us where you\'re voting from.' },
+  { icon: MapPin, title: 'Where do you live?', desc: 'Your city helps us find local candidates and polling booths.' },
+  { icon: Calendar, title: 'A bit about you', desc: 'Your age determines eligibility and registration routes.' },
+  { icon: UserIcon, title: 'Voter Status', desc: 'Are you registered on the electoral roll?' },
 ];
 
 export function Onboarding({ onComplete }: OnboardingProps) {
@@ -45,151 +57,149 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     });
   };
 
+  const currentInfo = STEP_INFO[step - 1];
+
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-lg mx-auto p-4">
-      <div className="flex justify-center mb-4">
-        <div className="flex gap-2">
+    <div className="flex flex-col gap-6 max-w-lg mx-auto p-4 w-full">
+      {/* Step Progress */}
+      <div className="flex justify-center mb-2">
+        <div className="flex gap-2 items-center">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className={`w-12 h-1.5 rounded-full transition-colors ${i <= step ? 'bg-accent' : 'bg-muted'}`} />
+            <div key={i} className="flex items-center gap-2">
+              <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500",
+                i < step
+                  ? "bg-gradient-to-br from-primary to-accent text-white scale-90"
+                  : i === step
+                  ? "bg-gradient-to-br from-primary to-accent text-white glow-primary scale-110"
+                  : "bg-secondary text-muted-foreground"
+              )}>
+                {i < step ? '✓' : i}
+              </div>
+              {i < 4 && (
+                <div className={cn(
+                  "w-8 h-0.5 rounded-full transition-colors duration-500",
+                  i < step ? "bg-gradient-to-r from-primary to-accent" : "bg-secondary"
+                )} />
+              )}
+            </div>
           ))}
         </div>
       </div>
 
-      {step === 1 && (
-        <Card className="border-none shadow-xl">
-          <CardHeader>
-            <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mb-4 text-primary">
-              <Globe className="w-6 h-6" />
-            </div>
-            <CardTitle className="text-2xl">Select your country</CardTitle>
-            <CardDescription>Voting rules vary significantly by nation. Tell us where you're voting from.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+      {/* Card */}
+      <Card className="glass-card border-border/30 shadow-2xl overflow-hidden">
+        <CardHeader className="pb-4">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-4 border border-primary/20">
+            <currentInfo.icon className="w-7 h-7 text-primary" />
+          </div>
+          <CardTitle className="text-2xl">{currentInfo.title}</CardTitle>
+          <CardDescription className="text-muted-foreground">{currentInfo.desc}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {step === 1 && (
             <div className="space-y-2">
-              <Label htmlFor="country">Country</Label>
+              <Label htmlFor="country" className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Country</Label>
               <Select value={formData.country} onValueChange={(val) => setFormData({...formData, country: val})}>
-                <SelectTrigger className="h-12 text-lg">
+                <SelectTrigger className="h-12 text-base bg-secondary/50 border-border/50 rounded-xl">
                   <SelectValue placeholder="Select a country" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="glass-card border-border/50">
                   {COUNTRIES.map(c => (
-                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    <SelectItem key={c.value} value={c.value} className="cursor-pointer">{c.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <Button className="w-full h-12 bg-accent text-lg btn-scale" onClick={nextStep}>
-              Continue
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+          )}
 
-      {step === 2 && (
-        <Card className="border-none shadow-xl">
-          <CardHeader>
-            <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mb-4 text-primary">
-              <MapPin className="w-6 h-6" />
-            </div>
-            <CardTitle className="text-2xl">Where do you live?</CardTitle>
-            <CardDescription>Knowing your city or state helps us find local candidates and polling booths.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+          {step === 2 && (
             <div className="space-y-2">
-              <Label htmlFor="location">City, State or District</Label>
+              <Label htmlFor="location" className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">City, State or District</Label>
               <Input 
                 id="location" 
                 placeholder={formData.country === 'India' ? "e.g. Mumbai, Maharashtra" : "e.g. Austin, TX"} 
                 value={formData.location}
                 onChange={(e) => setFormData({...formData, location: e.target.value})}
-                className="h-12 text-lg"
+                className="h-12 text-base bg-secondary/50 border-border/50 rounded-xl"
               />
             </div>
-            <div className="flex gap-4">
-              <Button variant="outline" className="flex-1 h-12 text-lg" onClick={prevStep}>Back</Button>
-              <Button className="flex-1 h-12 bg-accent text-lg btn-scale" onClick={nextStep} disabled={!formData.location}>
-                Continue
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
 
-      {step === 3 && (
-        <Card className="border-none shadow-xl">
-          <CardHeader>
-            <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mb-4 text-primary">
-              <Calendar className="w-6 h-6" />
-            </div>
-            <CardTitle className="text-2xl">A little bit about you</CardTitle>
-            <CardDescription>Your age determines your eligibility and specific registration routes.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+          {step === 3 && (
             <div className="space-y-2">
-              <Label htmlFor="age">How old are you?</Label>
+              <Label htmlFor="age" className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Your Age</Label>
               <Input 
                 id="age" 
                 type="number"
-                min={18}
+                min={16}
                 max={120}
                 value={formData.age}
                 onChange={(e) => setFormData({...formData, age: parseInt(e.target.value)})}
-                className="h-12 text-lg"
+                className="h-12 text-base bg-secondary/50 border-border/50 rounded-xl"
               />
             </div>
-            <div className="flex gap-4">
-              <Button variant="outline" className="flex-1 h-12 text-lg" onClick={prevStep}>Back</Button>
-              <Button className="flex-1 h-12 bg-accent text-lg btn-scale" onClick={nextStep}>Continue</Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
 
-      {step === 4 && (
-        <Card className="border-none shadow-xl">
-          <CardHeader>
-            <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mb-4 text-primary">
-              <UserIcon className="w-6 h-6" />
-            </div>
-            <CardTitle className="text-2xl">Voter Status</CardTitle>
-            <CardDescription>Are you currently registered on the electoral roll?</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+          {step === 4 && (
             <RadioGroup 
               value={formData.voterStatus} 
               onValueChange={(val) => setFormData({...formData, voterStatus: val as any})}
-              className="grid gap-4"
+              className="grid gap-3"
             >
               {[
-                { id: 'registered', label: 'Yes, I am registered' },
-                { id: 'unregistered', label: 'No, not yet' },
-                { id: 'unknown', label: 'I am not sure' }
+                { id: 'registered', label: 'Yes, I am registered', emoji: '✅' },
+                { id: 'unregistered', label: 'No, not yet', emoji: '📝' },
+                { id: 'unknown', label: 'I am not sure', emoji: '🤔' }
               ].map(item => (
                 <Label
                   key={item.id}
                   htmlFor={item.id}
                   className={cn(
-                    "flex items-center justify-between p-4 rounded-xl border-2 transition-all cursor-pointer",
-                    formData.voterStatus === item.id ? "border-accent bg-accent/5 ring-1 ring-accent" : "border-border hover:border-accent/50"
+                    "flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer",
+                    formData.voterStatus === item.id
+                      ? "border-primary bg-primary/5 ring-1 ring-primary glow-primary"
+                      : "border-border/50 bg-secondary/30 hover:border-primary/30"
                   )}
                 >
                   <div className="flex items-center gap-3">
                     <RadioGroupItem value={item.id} id={item.id} />
-                    <span className="text-lg font-medium">{item.label}</span>
+                    <span className="text-base font-medium">{item.emoji} {item.label}</span>
                   </div>
                 </Label>
               ))}
             </RadioGroup>
-            <div className="flex gap-4 pt-4">
-              <Button variant="outline" className="flex-1 h-12 text-lg" onClick={prevStep}>Back</Button>
-              <Button className="flex-1 h-12 bg-accent text-lg btn-scale" onClick={handleSubmit}>
-                <CheckCircle2 className="w-5 h-5 mr-2" />
-                Get Roadmap
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-2">
+            {step > 1 && (
+              <Button variant="outline" className="flex-1 h-12 text-base rounded-xl border-border/50 bg-secondary/30" onClick={prevStep}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
               </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            )}
+            {step < 4 ? (
+              <Button
+                className="flex-1 h-12 text-base rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 btn-scale btn-glow"
+                onClick={nextStep}
+                disabled={step === 2 && !formData.location}
+              >
+                Continue
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            ) : (
+              <Button
+                className="flex-1 h-12 text-base rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 btn-scale btn-glow"
+                onClick={handleSubmit}
+              >
+                <Sparkles className="w-5 h-5 mr-2" />
+                Launch My Roadmap
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

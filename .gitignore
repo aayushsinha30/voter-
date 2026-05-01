@@ -37,9 +37,27 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# genkit
 .genkit/*
-.env*
+
+# environment variables (keep secrets safe)
+.env
+.env.local
+.env.production
 
 # firebase
 firebase-debug.log
 firestore-debug.log
+
+# lock files (keep repo small)
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+
+# Firebase Studio
+.idx/
+.agents/
+.modified
+studio.json

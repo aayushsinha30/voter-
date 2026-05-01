@@ -5,22 +5,41 @@ import { Onboarding } from '@/components/voting/Onboarding';
 import { TopBar } from '@/components/layout/TopBar';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Checklist } from '@/components/voting/Checklist';
+import { ElectionCountdown } from '@/components/voting/ElectionCountdown';
+import { QuickStats } from '@/components/voting/QuickStats';
+import { ElectionNewsFeed } from '@/components/voting/ElectionNewsFeed';
 import { Card, CardContent } from '@/components/ui/card';
-import { Bell, MapPin } from 'lucide-react';
+import { Bell, MapPin, Sparkles, ArrowRight, Zap, BookOpen, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 export default function Home() {
   const { user, saveUser, loading } = useUserContext();
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center animate-pulse">
+            <Sparkles className="w-6 h-6 text-white" />
+          </div>
+          <p className="text-muted-foreground text-sm font-medium">Loading VoteWise...</p>
+        </div>
+      </div>
+    );
+  }
 
-  // Ensure user has a country selected, otherwise treat as not onboarded
   if (!user || !user.onboarded || !user.country) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center p-4">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-headline text-primary mb-2">VoteWise</h1>
-          <p className="text-muted-foreground">Your personalized civic roadmap to an informed vote.</p>
+        <div className="text-center mb-10 space-y-3">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-6 glow-primary">
+            <Sparkles className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-5xl font-headline gradient-text font-bold">VoteWise</h1>
+          <p className="text-muted-foreground text-lg max-w-sm mx-auto">
+            Your AI-powered civic command center for an informed vote.
+          </p>
         </div>
         <Onboarding onComplete={(data) => saveUser(data)} />
       </main>
@@ -30,63 +49,118 @@ export default function Home() {
   return (
     <div className="max-w-2xl mx-auto">
       <TopBar />
-      <main className="px-6 py-8 space-y-8 pb-32 animate-in fade-in duration-500">
-        <section className="space-y-4">
-          <div className="flex justify-between items-end">
-            <div>
-              <h2 className="text-2xl font-headline">Welcome back</h2>
-              <p className="text-muted-foreground">Status: {user.voterStatus === 'registered' ? 'Registered to vote' : 'Needs attention'}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="border-none bg-accent text-white shadow-lg btn-scale">
-              <CardContent className="p-4 flex flex-col gap-2">
-                <Bell className="w-6 h-6" />
-                <span className="font-bold text-lg">Next Window</span>
-                <span className="text-sm opacity-90">Registration Open</span>
-              </CardContent>
-            </Card>
-            <Card className="border-none bg-primary text-white shadow-lg btn-scale">
-              <CardContent className="p-4 flex flex-col gap-2">
-                <MapPin className="w-6 h-6" />
-                <span className="font-bold text-lg">Electoral Area</span>
-                <span className="text-sm opacity-90">{user.location}</span>
-              </CardContent>
-            </Card>
+      <main className="px-5 py-6 space-y-6 pb-28">
+        {/* Hero Section */}
+        <section className="space-y-4 stagger-item">
+          <div>
+            <h2 className="text-2xl font-headline">
+              Welcome back<span className="gradient-text">,</span>
+            </h2>
+            <p className="text-muted-foreground text-sm mt-1">
+              {user.voterStatus === 'registered'
+                ? '✅ You are registered to vote'
+                : user.voterStatus === 'unregistered'
+                ? '⚠️ Registration needed'
+                : '❓ Status unknown — check below'}
+            </p>
           </div>
         </section>
 
-        <section className="space-y-4">
-          <h3 className="text-lg font-headline uppercase tracking-widest text-muted-foreground">Readiness</h3>
+        {/* Quick Stats Cards */}
+        <section className="stagger-item">
+          <QuickStats user={user} />
+        </section>
+
+        {/* Election Countdown */}
+        <section className="stagger-item">
+          <ElectionCountdown country={user.country} />
+        </section>
+
+        {/* Readiness Checklist */}
+        <section className="space-y-3 stagger-item">
+          <h3 className="text-xs font-headline uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+            <div className="w-1 h-4 rounded-full bg-gradient-to-b from-primary to-accent" />
+            Readiness
+          </h3>
           <Checklist />
         </section>
 
-        <section className="space-y-4">
-          <h3 className="text-lg font-headline uppercase tracking-widest text-muted-foreground">Election Phases</h3>
+        {/* Election Phases */}
+        <section className="space-y-3 stagger-item">
+          <h3 className="text-xs font-headline uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+            <div className="w-1 h-4 rounded-full bg-gradient-to-b from-primary to-accent" />
+            Election Timeline
+          </h3>
           <div className="space-y-3">
             {[
-              { label: 'Phase 1: Voter Awareness', date: 'Ongoing', active: true },
-              { label: 'Phase 2: Nomination Review', date: 'Upcoming', active: false },
-              { label: 'Phase 3: Polling Day', date: 'TBD', active: false }
+              { label: 'Phase 1: Voter Awareness', date: 'Ongoing', active: true, icon: BookOpen },
+              { label: 'Phase 2: Nomination Review', date: 'Upcoming', active: false, icon: Bell },
+              { label: 'Phase 3: Polling Day', date: 'TBD', active: false, icon: Zap }
             ].map((item, i) => (
               <div key={i} className={cn(
-                "flex items-center gap-4 p-4 rounded-xl border transition-all",
-                item.active ? "bg-white border-accent shadow-sm" : "bg-secondary/50 border-border opacity-60"
+                "glass-card flex items-center gap-4 p-4 transition-all",
+                item.active ? "border-primary/30 glow-primary" : "opacity-50"
               )}>
                 <div className={cn(
-                  "w-12 h-12 rounded-lg flex flex-col items-center justify-center font-bold text-xs",
-                  item.active ? "bg-accent text-white" : "bg-muted text-muted-foreground"
+                  "w-11 h-11 rounded-xl flex items-center justify-center shrink-0",
+                  item.active
+                    ? "bg-gradient-to-br from-primary to-accent text-white"
+                    : "bg-secondary text-muted-foreground"
                 )}>
-                  <span>{item.date}</span>
+                  <item.icon className="w-5 h-5" />
                 </div>
-                <div className="flex-1">
-                  <p className="font-bold">{item.label}</p>
-                  <p className="text-xs text-muted-foreground">{user.country}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm">{item.label}</p>
+                  <p className="text-xs text-muted-foreground">{user.country} · {item.date}</p>
                 </div>
+                {item.active && (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-success pulse-live" />
+                    <span className="text-[10px] font-bold text-success uppercase">Live</span>
+                  </div>
+                )}
               </div>
             ))}
           </div>
+        </section>
+
+        {/* Quick Actions */}
+        <section className="space-y-3 stagger-item">
+          <h3 className="text-xs font-headline uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+            <div className="w-1 h-4 rounded-full bg-gradient-to-b from-primary to-accent" />
+            Quick Actions
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: 'Fact Check', desc: 'Verify any claim', href: '/tools', icon: ShieldCheck, color: 'from-primary to-purple-500' },
+              { label: 'Learn Civics', desc: 'AI explainer', href: '/learn', icon: BookOpen, color: 'from-accent to-emerald-400' },
+            ].map((action, i) => (
+              <Link key={i} href={action.href}>
+                <Card className={cn(
+                  "glass-card border-none overflow-hidden group cursor-pointer h-full"
+                )}>
+                  <CardContent className="p-4 flex flex-col gap-3">
+                    <div className={cn(
+                      "w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center text-white",
+                      action.color
+                    )}>
+                      <action.icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">{action.label}</p>
+                      <p className="text-[11px] text-muted-foreground">{action.desc}</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all mt-auto" />
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Election News Feed */}
+        <section className="stagger-item">
+          <ElectionNewsFeed country={user.country} />
         </section>
       </main>
       <BottomNav />
