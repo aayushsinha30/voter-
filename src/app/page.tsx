@@ -7,7 +7,6 @@ import { BottomNav } from '@/components/layout/BottomNav';
 import { Checklist } from '@/components/voting/Checklist';
 import { Card, CardContent } from '@/components/ui/card';
 import { Bell, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export default function Home() {
@@ -15,7 +14,8 @@ export default function Home() {
 
   if (loading) return null;
 
-  if (!user || !user.onboarded) {
+  // Ensure user has a country selected, otherwise treat as not onboarded
+  if (!user || !user.onboarded || !user.country) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center p-4">
         <div className="text-center mb-8">

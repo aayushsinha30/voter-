@@ -15,9 +15,15 @@ export function RoadmapDisplay({ user }: { user: UserContext }) {
 
   useEffect(() => {
     async function fetchRoadmap() {
+      // Don't attempt fetch if critical data is missing
+      if (!user.location || !user.voterStatus) {
+        setLoading(false);
+        return;
+      }
+      
       try {
         const result = await personalVotingRoadmap({
-          country: user.country,
+          country: user.country || 'India', // Fallback to handle any legacy state edge cases
           location: user.location,
           age: user.age,
           voterStatus: user.voterStatus
@@ -45,7 +51,7 @@ export function RoadmapDisplay({ user }: { user: UserContext }) {
     );
   }
 
-  if (!roadmap) return <div>Failed to load roadmap. Please try again.</div>;
+  if (!roadmap) return <div className="p-4 text-center text-muted-foreground italic">Unable to generate your voting roadmap. Please check your location settings.</div>;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">

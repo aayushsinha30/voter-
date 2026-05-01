@@ -10,7 +10,9 @@ export default function JourneyPage() {
   const { user, saveUser, loading } = useUserContext();
 
   if (loading) return null;
-  if (!user) return <Onboarding onComplete={saveUser} />;
+  
+  // Ensure country exists for journey generation
+  if (!user || !user.country) return <Onboarding onComplete={saveUser} />;
 
   return (
     <div className="max-w-2xl mx-auto">
