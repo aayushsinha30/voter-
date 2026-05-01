@@ -8,9 +8,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, Loader2, Sparkles, BookOpen } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { useAnalytics } from '@/hooks/use-analytics';
 
 export function ManifestoTool() {
   const { toast } = useToast();
+  const { track, events } = useAnalytics();
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<string | null>(null);
@@ -22,6 +24,7 @@ export function ManifestoTool() {
     try {
       const res = await summarizeManifesto({ manifestoText: text });
       setSummary(res.summary);
+      track(events.MANIFESTO_SUMMARIZED, { text_length: text.length });
     } catch (e: any) {
       console.error(e);
       toast({

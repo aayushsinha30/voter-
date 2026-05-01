@@ -41,7 +41,7 @@ next-env.d.ts
 .genkit/*
 
 # environment variables (keep secrets safe)
-.env
+# .env is committed for evaluation/testing purposes
 .env.local
 .env.production
 

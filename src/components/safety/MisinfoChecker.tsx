@@ -9,9 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { ShieldAlert, ShieldCheck, Loader2, AlertTriangle, Sparkles, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from "@/hooks/use-toast";
+import { useAnalytics } from '@/hooks/use-analytics';
 
 export function MisinfoChecker() {
   const { toast } = useToast();
+  const { track, events } = useAnalytics();
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<MisinformationCheckerOutput | null>(null);
@@ -21,8 +23,13 @@ export function MisinfoChecker() {
     setLoading(true);
     setResult(null);
     try {
+      track(events.FACT_CHECK_REQUESTED, { text_length: input.length });
       const res = await checkMisinformation({ information: input });
       setResult(res);
+      track(events.FACT_CHECK_COMPLETED, {
+        is_misinformation: res.isMisinformation,
+        confidence: res.confidenceScore,
+      });
     } catch (e: any) {
       console.error(e);
       toast({

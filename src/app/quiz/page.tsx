@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { TopBar } from '@/components/layout/TopBar';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { useUserContext } from '@/app/lib/user-store';
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, CheckCircle2, XCircle, ArrowRight, RotateCcw, Brain, Sparkles, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAnalytics } from '@/hooks/use-analytics';
 
 interface Question {
   question: string;
@@ -123,6 +124,7 @@ const QUIZ_DATA: Record<string, Question[]> = {
 
 export default function QuizPage() {
   const { user, saveUser } = useUserContext();
+  const { track, events } = useAnalytics();
   const [currentQ, setCurrentQ] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -138,16 +140,22 @@ export default function QuizPage() {
   const question = questions[currentQ];
   const totalQuestions = questions.length;
 
-  const handleAnswer = (idx: number) => {
+  const handleAnswer = useCallback((idx: number) => {
     if (showResult) return;
     setSelected(idx);
     setShowResult(true);
     const newAnswers = [...answers, idx];
     setAnswers(newAnswers);
-    if (idx === question.correct) {
+    const isCorrect = idx === question.correct;
+    if (isCorrect) {
       setScore(s => s + 1);
     }
-  };
+    track(events.QUIZ_QUESTION_ANSWERED, {
+      question_number: currentQ + 1,
+      is_correct: isCorrect,
+      country: user?.country,
+    });
+  }, [showResult, answers, question.correct, currentQ, track, events, user?.country]);
 
   const nextQuestion = () => {
     if (currentQ + 1 >= totalQuestions) {

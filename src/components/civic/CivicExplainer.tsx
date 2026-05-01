@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Search, Lightbulb, Loader2, Sparkles, Brain } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { cn } from '@/lib/utils';
+import { useAnalytics } from '@/hooks/use-analytics';
 
 const SUGGESTED_TOPICS: Record<string, string[]> = {
   'India': ['Lok Sabha', 'Rajya Sabha', 'EVM Machines', 'Anti-Defection Law', 'NOTA', 'First Past the Post'],
@@ -21,6 +22,7 @@ const SUGGESTED_TOPICS: Record<string, string[]> = {
 export function CivicExplainer() {
   const { user } = useUserContext();
   const { toast } = useToast();
+  const { track, events } = useAnalytics();
   const [concept, setConcept] = useState('');
   const [level, setLevel] = useState<'simple' | 'detailed' | 'expert'>('simple');
   const [loading, setLoading] = useState(false);
@@ -40,6 +42,7 @@ export function CivicExplainer() {
         country: user?.country || 'India' 
       });
       setResult(res);
+      track(events.CIVIC_CONCEPT_SEARCHED, { concept: searchTerm, level, country: user?.country });
     } catch (e: any) {
       console.error(e);
       toast({
