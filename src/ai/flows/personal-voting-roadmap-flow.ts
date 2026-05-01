@@ -11,6 +11,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const PersonalVotingRoadmapInputSchema = z.object({
+  country: z.string().describe('The user\'s country of residence (e.g., India, USA).'),
   location: z.string().describe('The user\'s current residential location (city, state, zip code).'),
   age: z.number().int().min(18).describe('The user\'s age in years.'),
   voterStatus: z.enum(['registered', 'unregistered', 'unknown']).describe('The user\'s current voter registration status.'),
@@ -38,16 +39,22 @@ const personalVotingRoadmapPrompt = ai.definePrompt({
   name: 'personalVotingRoadmapPrompt',
   input: {schema: PersonalVotingRoadmapInputSchema},
   output: {schema: PersonalVotingRoadmapOutputSchema},
-  prompt: `You are an expert civic engagement assistant dedicated to helping individuals vote successfully. Your task is to generate a personalized, step-by-step voting roadmap based on the provided user information.
+  prompt: `You are an expert civic engagement assistant dedicated to helping individuals vote successfully in their specific country. Your task is to generate a personalized, step-by-step voting roadmap.
 
-Consider the user's location, age, and voter status to provide highly relevant and actionable steps. Ensure the roadmap covers everything from registration (if needed) to casting a ballot.
-
-User Information:
+Context:
+Country: {{{country}}}
 Location: {{{location}}}
 Age: {{{age}}}
 Voter Status: {{{voterStatus}}}
 
-Generate a step-by-step roadmap tailored to this user. Each step should include a title, a detailed description, and an optional actionable link if applicable (e.g., a link to a voter registration site or election official website).`,
+Instructions:
+1. Tailor all steps to the electoral laws and procedures of {{{country}}}.
+2. If India, reference Aadhaar, EPIC (Voter ID), and the Election Commission of India (ECI) portal.
+3. If USA, reference state-specific registration, DMV requirements, or vote-by-mail processes.
+4. Ensure the steps are sequential and easy to follow.
+5. Provide actual official URLs for links if you are certain of them (e.g., voters.eci.gov.in for India, vote.gov for USA).
+
+Generate a roadmap with a relevant title.`,
 });
 
 const personalVotingRoadmapFlow = ai.defineFlow(

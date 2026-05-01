@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 
 export interface UserContext {
+  country: string;
   location: string;
   age: number;
   voterStatus: 'registered' | 'unregistered' | 'unknown';

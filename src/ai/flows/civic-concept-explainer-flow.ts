@@ -12,6 +12,7 @@ import {z} from 'genkit';
 
 const CivicConceptExplainerInputSchema = z.object({
   concept: z.string().describe('The complex civic concept to be explained.'),
+  country: z.string().optional().describe('The country context for the explanation (e.g., India, USA).'),
   comprehensionLevel: z
     .enum(['simple', 'detailed', 'expert'])
     .optional()
@@ -43,7 +44,20 @@ const civicConceptExplainerPrompt = ai.definePrompt({
   name: 'civicConceptExplainerPrompt',
   input: {schema: CivicConceptExplainerInputSchema},
   output: {schema: CivicConceptExplainerOutputSchema},
-  prompt: `You are an AI assistant specialized in explaining complex civic concepts in simple, easy-to-understand language. Your goal is to make political processes and terminology accessible to everyone, helping users make informed voting decisions.\n\nPlease explain the following civic concept: "{{{concept}}}}".\n\n{{#if comprehensionLevel}}\nAdapt the explanation to a "{{{comprehensionLevel}}}" comprehension level.\n{{else}}\nProvide a simple explanation suitable for a general audience.\n{{/if}}\n\nAfter explaining the concept, provide a list of related terms or concepts that someone might find useful for further understanding.\n\nPlease ensure the explanation is neutral, objective, and avoids jargon where possible. Focus on clarity and conciseness.`,
+  prompt: `You are an AI assistant specialized in explaining complex civic concepts in simple, easy-to-understand language.
+
+Concept: "{{{concept}}}}"
+{{#if country}}
+Country Context: {{{country}}}
+{{/if}}
+
+Instructions:
+1. Explain the concept clearly. 
+2. If a country context is provided, explain how this concept specifically applies or works in that country (e.g., if India, mention the Lok Sabha or Rajya Sabha if relevant).
+3. Adapting to level: {{#if comprehensionLevel}}{{{comprehensionLevel}}}{{else}}simple{{/if}}.
+4. Provide a list of related terms that are relevant to the user's country if possible.
+
+Maintain a neutral, objective, and jargon-free tone.`,
 });
 
 const civicConceptExplainerFlow = ai.defineFlow(

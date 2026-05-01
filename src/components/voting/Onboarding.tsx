@@ -6,17 +6,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UserContext } from '@/app/lib/user-store';
-import { MapPin, User as UserIcon, Calendar, CheckCircle2 } from 'lucide-react';
+import { MapPin, User as UserIcon, Calendar, CheckCircle2, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface OnboardingProps {
   onComplete: (data: UserContext) => void;
 }
 
+const COUNTRIES = [
+  { value: 'India', label: 'India' },
+  { value: 'United States', label: 'United States' },
+  { value: 'United Kingdom', label: 'United Kingdom' },
+  { value: 'Canada', label: 'Canada' },
+  { value: 'Australia', label: 'Australia' },
+];
+
 export function Onboarding({ onComplete }: OnboardingProps) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<Partial<UserContext>>({
+    country: 'India',
     location: '',
     age: 18,
     voterStatus: 'unknown',
@@ -27,6 +37,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
   const handleSubmit = () => {
     onComplete({
+      country: formData.country || 'India',
       location: formData.location || 'Unknown',
       age: Number(formData.age) || 18,
       voterStatus: formData.voterStatus as any,
@@ -38,7 +49,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-lg mx-auto p-4">
       <div className="flex justify-center mb-4">
         <div className="flex gap-2">
-          {[1, 2, 3].map(i => (
+          {[1, 2, 3, 4].map(i => (
             <div key={i} className={`w-12 h-1.5 rounded-full transition-colors ${i <= step ? 'bg-accent' : 'bg-muted'}`} />
           ))}
         </div>
@@ -48,23 +59,26 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         <Card className="border-none shadow-xl">
           <CardHeader>
             <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mb-4 text-primary">
-              <MapPin className="w-6 h-6" />
+              <Globe className="w-6 h-6" />
             </div>
-            <CardTitle className="text-2xl">Where do you vote?</CardTitle>
-            <CardDescription>Knowing your location helps us find local candidates and polling places.</CardDescription>
+            <CardTitle className="text-2xl">Select your country</CardTitle>
+            <CardDescription>Voting rules vary significantly by nation. Tell us where you're voting from.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="location">City and State (or Zip Code)</Label>
-              <Input 
-                id="location" 
-                placeholder="e.g. Austin, TX" 
-                value={formData.location}
-                onChange={(e) => setFormData({...formData, location: e.target.value})}
-                className="h-12 text-lg"
-              />
+              <Label htmlFor="country">Country</Label>
+              <Select value={formData.country} onValueChange={(val) => setFormData({...formData, country: val})}>
+                <SelectTrigger className="h-12 text-lg">
+                  <SelectValue placeholder="Select a country" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COUNTRIES.map(c => (
+                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <Button className="w-full h-12 bg-accent text-lg btn-scale" onClick={nextStep} disabled={!formData.location}>
+            <Button className="w-full h-12 bg-accent text-lg btn-scale" onClick={nextStep}>
               Continue
             </Button>
           </CardContent>
@@ -75,10 +89,40 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         <Card className="border-none shadow-xl">
           <CardHeader>
             <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mb-4 text-primary">
+              <MapPin className="w-6 h-6" />
+            </div>
+            <CardTitle className="text-2xl">Where do you live?</CardTitle>
+            <CardDescription>Knowing your city or state helps us find local candidates and polling booths.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="location">City, State or District</Label>
+              <Input 
+                id="location" 
+                placeholder={formData.country === 'India' ? "e.g. Mumbai, Maharashtra" : "e.g. Austin, TX"} 
+                value={formData.location}
+                onChange={(e) => setFormData({...formData, location: e.target.value})}
+                className="h-12 text-lg"
+              />
+            </div>
+            <div className="flex gap-4">
+              <Button variant="outline" className="flex-1 h-12 text-lg" onClick={prevStep}>Back</Button>
+              <Button className="flex-1 h-12 bg-accent text-lg btn-scale" onClick={nextStep} disabled={!formData.location}>
+                Continue
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {step === 3 && (
+        <Card className="border-none shadow-xl">
+          <CardHeader>
+            <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mb-4 text-primary">
               <Calendar className="w-6 h-6" />
             </div>
             <CardTitle className="text-2xl">A little bit about you</CardTitle>
-            <CardDescription>Age matters for certain registration deadlines and voting requirements.</CardDescription>
+            <CardDescription>Your age determines your eligibility and specific registration routes.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
@@ -101,14 +145,14 @@ export function Onboarding({ onComplete }: OnboardingProps) {
         </Card>
       )}
 
-      {step === 3 && (
+      {step === 4 && (
         <Card className="border-none shadow-xl">
           <CardHeader>
             <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mb-4 text-primary">
               <UserIcon className="w-6 h-6" />
             </div>
             <CardTitle className="text-2xl">Voter Status</CardTitle>
-            <CardDescription>Are you currently registered to vote in your area?</CardDescription>
+            <CardDescription>Are you currently registered on the electoral roll?</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <RadioGroup 

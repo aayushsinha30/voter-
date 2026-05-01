@@ -1,27 +1,43 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { FileCheck, AlertCircle } from 'lucide-react';
+import { useUserContext } from '@/app/lib/user-store';
 import { cn } from '@/lib/utils';
 
 export function Checklist() {
-  const [items, setItems] = useState([
-    { id: 1, label: 'Valid Photo ID (Driver License, Passport, etc.)', checked: false, critical: true },
-    { id: 2, label: 'Proof of Residence (Utility bill, bank statement)', checked: false, critical: true },
-    { id: 3, label: 'Voter Registration Card (Optional but helpful)', checked: false, critical: false },
-    { id: 4, label: 'Polling Location Address saved', checked: false, critical: true },
-    { id: 5, label: 'Plan for transport to the polls', checked: false, critical: false },
-  ]);
+  const { user } = useUserContext();
+  const [items, setItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (user?.country === 'India') {
+      setItems([
+        { id: 1, label: 'EPIC Card (Voter ID) or Aadhaar Card', checked: false, critical: true },
+        { id: 2, label: 'Voter Information Slip (from ECI portal)', checked: false, critical: true },
+        { id: 3, label: 'Check Polling Station (Local Government School/Community Center)', checked: false, critical: true },
+        { id: 4, label: 'Check name on Electoral Roll (voters.eci.gov.in)', checked: false, critical: true },
+        { id: 5, label: 'Identify candidate for your constituency', checked: false, critical: false },
+      ]);
+    } else {
+      setItems([
+        { id: 1, label: 'Valid Photo ID (Driver License, Passport, etc.)', checked: false, critical: true },
+        { id: 2, label: 'Proof of Residence (Utility bill, bank statement)', checked: false, critical: true },
+        { id: 3, label: 'Voter Registration Card (Optional but helpful)', checked: false, critical: false },
+        { id: 4, label: 'Polling Location Address saved', checked: false, critical: true },
+        { id: 5, label: 'Plan for transport to the polls', checked: false, critical: false },
+      ]);
+    }
+  }, [user]);
 
   const toggle = (id: number) => {
     setItems(items.map(item => item.id === id ? { ...item, checked: !item.checked } : item));
   };
 
   const completedCount = items.filter(i => i.checked).length;
-  const progress = (completedCount / items.length) * 100;
+  const progress = items.length > 0 ? (completedCount / items.length) * 100 : 0;
 
   return (
     <Card className="border-none shadow-md overflow-hidden">
@@ -37,7 +53,7 @@ export function Checklist() {
             {completedCount}/{items.length} Done
           </Badge>
         </div>
-        <CardDescription>Essential documents and tasks for your voting day.</CardDescription>
+        <CardDescription>Essential documents for voting in {user?.country || 'your area'}.</CardDescription>
       </CardHeader>
       <CardContent className="pt-6 space-y-4">
         {items.map(item => (
@@ -52,7 +68,7 @@ export function Checklist() {
               </label>
               {item.critical && !item.checked && (
                 <span className="text-[10px] flex items-center gap-1 text-warning font-bold uppercase tracking-tight">
-                  <AlertCircle className="w-3 h-3" /> Required in most states
+                  <AlertCircle className="w-3 h-3" /> Mandatory for voting
                 </span>
               )}
             </div>

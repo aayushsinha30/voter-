@@ -35,7 +35,7 @@ export default function Home() {
           <div className="flex justify-between items-end">
             <div>
               <h2 className="text-2xl font-headline">Welcome back</h2>
-              <p className="text-muted-foreground">Current status: {user.voterStatus === 'registered' ? 'Registered to vote' : 'Needs attention'}</p>
+              <p className="text-muted-foreground">Status: {user.voterStatus === 'registered' ? 'Registered to vote' : 'Needs attention'}</p>
             </div>
           </div>
 
@@ -43,49 +43,47 @@ export default function Home() {
             <Card className="border-none bg-accent text-white shadow-lg btn-scale">
               <CardContent className="p-4 flex flex-col gap-2">
                 <Bell className="w-6 h-6" />
-                <span className="font-bold text-lg">Next Deadline</span>
-                <span className="text-sm opacity-90">Oct 24: Registration</span>
+                <span className="font-bold text-lg">Next Window</span>
+                <span className="text-sm opacity-90">Registration Open</span>
               </CardContent>
             </Card>
             <Card className="border-none bg-primary text-white shadow-lg btn-scale">
               <CardContent className="p-4 flex flex-col gap-2">
                 <MapPin className="w-6 h-6" />
-                <span className="font-bold text-lg">Polling Station</span>
-                <span className="text-sm opacity-90">Civic Center, Main St.</span>
+                <span className="font-bold text-lg">Electoral Area</span>
+                <span className="text-sm opacity-90">{user.location}</span>
               </CardContent>
             </Card>
           </div>
         </section>
 
         <section className="space-y-4">
-          <h3 className="text-lg font-headline uppercase tracking-widest text-muted-foreground">Immediate Tasks</h3>
+          <h3 className="text-lg font-headline uppercase tracking-widest text-muted-foreground">Readiness</h3>
           <Checklist />
         </section>
 
         <section className="space-y-4">
-          <h3 className="text-lg font-headline uppercase tracking-widest text-muted-foreground">Election Timeline</h3>
+          <h3 className="text-lg font-headline uppercase tracking-widest text-muted-foreground">Election Phases</h3>
           <div className="space-y-3">
             {[
-              { date: 'Oct 15', event: 'Early Voting Begins', active: true },
-              { date: 'Oct 24', event: 'Last Day to Register', active: false },
-              { date: 'Nov 05', event: 'General Election Day', active: false }
+              { label: 'Phase 1: Voter Awareness', date: 'Ongoing', active: true },
+              { label: 'Phase 2: Nomination Review', date: 'Upcoming', active: false },
+              { label: 'Phase 3: Polling Day', date: 'TBD', active: false }
             ].map((item, i) => (
               <div key={i} className={cn(
                 "flex items-center gap-4 p-4 rounded-xl border transition-all",
                 item.active ? "bg-white border-accent shadow-sm" : "bg-secondary/50 border-border opacity-60"
               )}>
                 <div className={cn(
-                  "w-12 h-12 rounded-lg flex flex-col items-center justify-center font-bold text-sm",
+                  "w-12 h-12 rounded-lg flex flex-col items-center justify-center font-bold text-xs",
                   item.active ? "bg-accent text-white" : "bg-muted text-muted-foreground"
                 )}>
-                  <span>{item.date.split(' ')[0]}</span>
-                  <span className="text-xs">{item.date.split(' ')[1]}</span>
+                  <span>{item.date}</span>
                 </div>
                 <div className="flex-1">
-                  <p className="font-bold">{item.event}</p>
-                  <p className="text-xs text-muted-foreground">In Austin, TX</p>
+                  <p className="font-bold">{item.label}</p>
+                  <p className="text-xs text-muted-foreground">{user.country}</p>
                 </div>
-                {item.active && <Button size="sm" variant="outline" className="text-[10px] h-8 px-2 border-accent text-accent">Add to Cal</Button>}
               </div>
             ))}
           </div>

@@ -17,6 +17,7 @@ export function RoadmapDisplay({ user }: { user: UserContext }) {
     async function fetchRoadmap() {
       try {
         const result = await personalVotingRoadmap({
+          country: user.country,
           location: user.location,
           age: user.age,
           voterStatus: user.voterStatus
@@ -50,7 +51,7 @@ export function RoadmapDisplay({ user }: { user: UserContext }) {
     <div className="space-y-8 animate-in fade-in duration-700">
       <div className="space-y-2">
         <h2 className="text-2xl font-headline text-primary">{roadmap.title}</h2>
-        <p className="text-muted-foreground">Tailored for {user.location}</p>
+        <p className="text-muted-foreground">Tailored for {user.location}, {user.country}</p>
       </div>
 
       <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-accent before:to-transparent">

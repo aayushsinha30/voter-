@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { explainCivicConcept, CivicConceptExplainerOutput } from '@/ai/flows/civic-concept-explainer-flow';
+import { useUserContext } from '@/app/lib/user-store';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Search, Lightbulb, Loader2 } from 'lucide-react';
 
 export function CivicExplainer() {
+  const { user } = useUserContext();
   const [concept, setConcept] = useState('');
   const [level, setLevel] = useState<'simple' | 'detailed' | 'expert'>('simple');
   const [loading, setLoading] = useState(false);
@@ -19,7 +21,11 @@ export function CivicExplainer() {
     if (!concept.trim()) return;
     setLoading(true);
     try {
-      const res = await explainCivicConcept({ concept, comprehensionLevel: level });
+      const res = await explainCivicConcept({ 
+        concept, 
+        comprehensionLevel: level,
+        country: user?.country || 'India' 
+      });
       setResult(res);
     } catch (e) {
       console.error(e);
@@ -36,14 +42,14 @@ export function CivicExplainer() {
             <BookOpen className="w-6 h-6 text-primary" />
             Civic Explainer
           </CardTitle>
-          <CardDescription>Demystify complex political processes and terminology.</CardDescription>
+          <CardDescription>Demystify politics in {user?.country || 'India'}.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input 
-                placeholder="e.g. Electoral College, Gerrymandering..." 
+                placeholder={user?.country === 'India' ? "e.g. Lok Sabha, Anti-Defection Law..." : "e.g. Electoral College, Gerrymandering..."}
                 className="pl-9 h-12"
                 value={concept}
                 onChange={(e) => setConcept(e.target.value)}
