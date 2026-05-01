@@ -8,8 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ShieldAlert, ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useToast } from "@/hooks/use-toast";
 
 export function MisinfoChecker() {
+  const { toast } = useToast();
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<MisinformationCheckerOutput | null>(null);
@@ -20,8 +22,15 @@ export function MisinfoChecker() {
     try {
       const res = await checkMisinformation({ information: input });
       setResult(res);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      toast({
+        variant: "destructive",
+        title: "Analysis Error",
+        description: e.message?.includes('503') 
+          ? "AI model is experiencing high load. Please try again shortly."
+          : "Unable to analyze information at this time.",
+      });
     } finally {
       setLoading(false);
     }

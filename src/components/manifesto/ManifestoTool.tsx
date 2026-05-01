@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, Loader2, Sparkles } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
 export function ManifestoTool() {
+  const { toast } = useToast();
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<string | null>(null);
@@ -19,8 +21,15 @@ export function ManifestoTool() {
     try {
       const res = await summarizeManifesto({ manifestoText: text });
       setSummary(res.summary);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      toast({
+        variant: "destructive",
+        title: "Summarization Failed",
+        description: e.message?.includes('503') 
+          ? "AI services are currently busy. Please try again in a minute."
+          : "Could not summarize the manifesto. Please try again.",
+      });
     } finally {
       setLoading(false);
     }

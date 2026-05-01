@@ -9,9 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Search, Lightbulb, Loader2 } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
 export function CivicExplainer() {
   const { user } = useUserContext();
+  const { toast } = useToast();
   const [concept, setConcept] = useState('');
   const [level, setLevel] = useState<'simple' | 'detailed' | 'expert'>('simple');
   const [loading, setLoading] = useState(false);
@@ -27,8 +29,15 @@ export function CivicExplainer() {
         country: user?.country || 'India' 
       });
       setResult(res);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      toast({
+        variant: "destructive",
+        title: "Service Unavailable",
+        description: e.message?.includes('503') 
+          ? "AI models are currently in high demand. Please try again in a moment."
+          : "Could not explain this concept. Please check your connection and try again.",
+      });
     } finally {
       setLoading(false);
     }

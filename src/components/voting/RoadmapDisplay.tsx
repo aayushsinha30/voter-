@@ -6,37 +6,53 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, CheckCircle2, Circle } from 'lucide-react';
+import { ExternalLink, CheckCircle2, Circle, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 export function RoadmapDisplay({ user }: { user: UserContext }) {
+  const { toast } = useToast();
   const [roadmap, setRoadmap] = useState<PersonalVotingRoadmapOutput | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  async function fetchRoadmap() {
+    setLoading(true);
+    setError(null);
+    
+    // Don't attempt fetch if critical data is missing
+    if (!user.location || !user.voterStatus) {
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      const result = await personalVotingRoadmap({
+        country: user.country || 'India',
+        location: user.location,
+        age: user.age,
+        voterStatus: user.voterStatus
+      });
+      setRoadmap(result);
+    } catch (e: any) {
+      console.error("Roadmap generation failed", e);
+      const msg = e.message?.includes('503') 
+        ? "AI model is busy. Please try refreshing." 
+        : "Failed to generate roadmap.";
+      setError(msg);
+      toast({
+        variant: "destructive",
+        title: "Generation Error",
+        description: msg,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function fetchRoadmap() {
-      // Don't attempt fetch if critical data is missing
-      if (!user.location || !user.voterStatus) {
-        setLoading(false);
-        return;
-      }
-      
-      try {
-        const result = await personalVotingRoadmap({
-          country: user.country || 'India', // Fallback to handle any legacy state edge cases
-          location: user.location,
-          age: user.age,
-          voterStatus: user.voterStatus
-        });
-        setRoadmap(result);
-      } catch (e) {
-        console.error("Roadmap generation failed", e);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchRoadmap();
-  }, [user]);
+  }, [user.country, user.location, user.voterStatus, user.age]);
 
   if (loading) {
     return (
@@ -48,6 +64,23 @@ export function RoadmapDisplay({ user }: { user: UserContext }) {
           </Card>
         ))}
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="border-destructive/20 bg-destructive/5 text-center p-8 space-y-4">
+        <div className="flex justify-center">
+          <AlertCircle className="w-12 h-12 text-destructive" />
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-lg font-bold">Something went wrong</h3>
+          <p className="text-muted-foreground">{error}</p>
+        </div>
+        <Button variant="outline" onClick={fetchRoadmap} className="gap-2">
+          <RefreshCw className="w-4 h-4" /> Try Again
+        </Button>
+      </Card>
     );
   }
 
