@@ -32,6 +32,8 @@ export function ManifestoTool() {
       console.error(e);
       const msg = e.message?.includes('429') 
         ? "API Quota Exceeded. Check your API limits." 
+        : e.message?.includes('400') && e.message?.toLowerCase().includes('api key')
+        ? "Google Gemini API Key is invalid or expired. Please generate a new one."
         : e.message?.includes('503') 
           ? "AI services are currently busy. Please try again in a minute."
           : "Could not summarize the manifesto. Please try again.";

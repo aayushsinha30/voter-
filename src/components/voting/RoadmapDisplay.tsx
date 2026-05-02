@@ -42,6 +42,8 @@ export function RoadmapDisplay({ user }: { user: UserContext }) {
       console.error("Roadmap generation failed", e);
       const msg = e.message?.includes('429')
         ? "API Quota Exceeded. Check your Google Gemini API billing/limits."
+        : e.message?.includes('400') && e.message?.toLowerCase().includes('api key')
+        ? "Google Gemini API Key is invalid or expired. Please generate a new one."
         : e.message?.includes('503') 
         ? "AI model is busy. Please try refreshing." 
         : "Failed to generate roadmap.";
