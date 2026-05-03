@@ -1,91 +1,26 @@
-import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
-import { getAnalytics, logEvent, isSupported, type Analytics } from 'firebase/analytics';
+import { type FirebaseApp } from 'firebase/app';
+import { type Analytics } from 'firebase/analytics';
 
 /**
- * Firebase configuration for VoteWise
- * Uses Google Analytics via Firebase for usage tracking and telemetry.
+ * Hard-Disabled Firebase Configuration
+ * To prevent client-side crashes on the Quiz page caused by expired/invalid API keys.
+ * The app now runs in "Offline Mode" for analytics.
  */
-const FIREBASE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || '';
-const FIREBASE_PROJECT_ID = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '';
-const FIREBASE_APP_ID = process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '';
+const isFirebaseConfigured = false;
 
-/**
- * Firebase configuration for VoteWise
- * Uses Google Analytics via Firebase for usage tracking and telemetry.
- * All values are optional - app works fully without Firebase.
- */
-const firebaseConfig = {
-  apiKey: FIREBASE_API_KEY,
-  projectId: FIREBASE_PROJECT_ID || 'votewise-civic',
-  appId: FIREBASE_APP_ID || '1:000000000000:web:votewise',
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || '',
-};
-
-// Only initialize Firebase if we have a real API key AND it's explicitly enabled
-// For now, we disable it to prevent crashes on the Quiz page until a valid Firebase key is provided.
-const isFirebaseConfigured = false; 
-
-let app: FirebaseApp | null = null;
-let analytics: Analytics | null = null;
-
-/**
- * Initialize Firebase app (singleton pattern)
- * Returns null safely if not configured
- */
 export function getFirebaseApp(): FirebaseApp | null {
-  if (!isFirebaseConfigured) return null;
-  if (!app) {
-    try {
-      const existingApps = getApps();
-      app = existingApps.length > 0 ? existingApps[0] : initializeApp(firebaseConfig);
-    } catch (error) {
-      console.warn('Firebase app initialization failed:', error);
-      return null;
-    }
-  }
-  return app;
+  return null;
 }
 
-/**
- * Initialize Firebase Analytics (client-side only)
- */
 export async function getFirebaseAnalytics(): Promise<Analytics | null> {
-  if (typeof window === 'undefined') return null;
-  if (!isFirebaseConfigured) return null;
-  if (analytics) return analytics;
-
-  try {
-    const supported = await isSupported();
-    if (supported) {
-      const firebaseApp = getFirebaseApp();
-      if (firebaseApp) {
-        analytics = getAnalytics(firebaseApp);
-      }
-    }
-  } catch (error) {
-    console.warn('Firebase Analytics not available:', error);
-  }
-  return analytics;
+  return null;
 }
 
-/**
- * Log a custom analytics event
- */
 export async function trackEvent(eventName: string, params?: Record<string, unknown>): Promise<void> {
-  try {
-    const analyticsInstance = await getFirebaseAnalytics();
-    if (analyticsInstance) {
-      logEvent(analyticsInstance, eventName, params);
-    }
-  } catch (error) {
-    // Silently fail - analytics should never break the app
-    console.debug('Analytics event failed:', eventName, error);
-  }
+  // No-op: Analytics is disabled to prevent crashes
+  console.debug('Analytics Disabled:', eventName, params);
 }
 
-/**
- * Predefined analytics events for VoteWise
- */
 export const VoteWiseEvents = {
   ONBOARDING_STARTED: 'onboarding_started',
   ONBOARDING_COMPLETED: 'onboarding_completed',
