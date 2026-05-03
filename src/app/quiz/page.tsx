@@ -136,9 +136,21 @@ export default function QuizPage() {
     return <Onboarding onComplete={saveUser} />;
   }
 
-  const questions = QUIZ_DATA[user.country] || QUIZ_DATA['default'];
-  const question = questions[currentQ];
+  // Safety check: ensure we have questions for the user's country or fallback to default
+  const questions = (user?.country && QUIZ_DATA[user.country]) || QUIZ_DATA['default'] || [];
   const totalQuestions = questions.length;
+  
+  // Safety check: ensure current index is within bounds
+  const safeIndex = Math.min(currentQ, Math.max(0, totalQuestions - 1));
+  const question = questions[safeIndex];
+
+  if (!question && !quizComplete) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <p className="text-muted-foreground italic">Preparing your quiz...</p>
+      </div>
+    );
+  }
 
   const handleAnswer = useCallback((idx: number) => {
     if (showResult) return;
