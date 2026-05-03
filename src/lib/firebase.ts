@@ -21,8 +21,9 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || '',
 };
 
-// Only initialize Firebase if we have a real API key
-const isFirebaseConfigured = Boolean(FIREBASE_API_KEY && FIREBASE_API_KEY.length > 20 && !FIREBASE_APP_ID.includes('000000000000'));
+// Only initialize Firebase if we have a real API key AND it's explicitly enabled
+// For now, we disable it to prevent crashes on the Quiz page until a valid Firebase key is provided.
+const isFirebaseConfigured = false; 
 
 let app: FirebaseApp | null = null;
 let analytics: Analytics | null = null;
