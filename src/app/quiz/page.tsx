@@ -189,8 +189,11 @@ export default function QuizPage() {
   };
 
   const getGrade = () => {
-    const pct = (score / totalQuestions) * 100;
-    if (pct >= 90) return { label: 'Civic Champion 🏆', color: 'text-yellow-400', desc: 'Outstanding! You\'re incredibly well-informed.' };
+    // Avoid division by zero which causes NaN crashes
+    const denominator = totalQuestions > 0 ? totalQuestions : 1;
+    const pct = (score / denominator) * 100;
+    
+    if (pct >= 90) return { label: 'Civic Champion 🏆', color: 'text-yellow-400', desc: "Outstanding! You're incredibly well-informed." };
     if (pct >= 70) return { label: 'Informed Citizen ⭐', color: 'text-success', desc: 'Great job! You have strong civic knowledge.' };
     if (pct >= 50) return { label: 'Growing Learner 📚', color: 'text-accent', desc: 'Good start! Keep learning with our tools.' };
     return { label: 'Civic Beginner 🌱', color: 'text-warning', desc: 'No worries! Head to Learn to boost your knowledge.' };
