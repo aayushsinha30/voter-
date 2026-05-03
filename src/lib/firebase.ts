@@ -1,24 +1,20 @@
-import { type FirebaseApp } from 'firebase/app';
-import { type Analytics } from 'firebase/analytics';
-
 /**
- * Hard-Disabled Firebase Configuration
- * To prevent client-side crashes on the Quiz page caused by expired/invalid API keys.
- * The app now runs in "Offline Mode" for analytics.
+ * GHOST MODE Firebase Configuration
+ * Completely stripped of all Firebase SDK imports to prevent client-side crashes.
+ * The app now runs in 100% "Offline Mode" for analytics.
  */
-const isFirebaseConfigured = false;
 
-export function getFirebaseApp(): FirebaseApp | null {
+export function getFirebaseApp(): any {
   return null;
 }
 
-export async function getFirebaseAnalytics(): Promise<Analytics | null> {
+export async function getFirebaseAnalytics(): Promise<any> {
   return null;
 }
 
 export async function trackEvent(eventName: string, params?: Record<string, unknown>): Promise<void> {
-  // No-op: Analytics is disabled to prevent crashes
-  console.debug('Analytics Disabled:', eventName, params);
+  // No-op: All background tracking is strictly disabled to guarantee stability
+  console.log('Analytics Suppressed:', eventName, params);
 }
 
 export const VoteWiseEvents = {
